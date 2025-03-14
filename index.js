@@ -13,48 +13,78 @@ const postRoute = require("./routes/post");
 const categoryRoute = require("./routes/category");
 
 dotenv.config();
+const cloudinary = require("./cloudinary");
+
 const PORT = process.env.PORT || 4560;
 
 app.use(express.json());
 app.use("/images", express.static(path.join(__dirname, "/images")));
 app.use(
   cors({
-    origin: [
-      "http://localhost:3001",
-      "http://localhost:3000",
-      "https://blog-app-ui-two.vercel.app",
-    ],
+    origin: [process.env.LOCAL_URL, "https://blog-app-ui-two.vercel.app"],
   })
 );
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    if (req.body.directory) {
-      cb(null, req.body.directory);
-    } else {
-      cb(null, "images");
-    }
-  },
-  filename: (req, file, cb) => {
-    cb(null, req.body.name);
-  },
-});
-
-const upload = multer({ storage: storage });
 
 mongoose
   .connect(process.env.MONGO_URL)
   .then(console.log("Connected to MongoDB."))
   .catch((error) => console.error(error));
 
-app.post("/api/upload", upload.single("file"), (req, res) => {
-  res.status(200).json("File has been uploaded.");
-});
+// app.post("/api/upload", upload.single("file"), (req, res) => {
+//   res.status(200).json("File has been uploaded.");
+// });
 
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
 app.use("/api/post", postRoute);
 app.use("/api/category", categoryRoute);
+
+const upload = multer();
+
+const uploadToCloudinary = (buffer, mimetype, folder) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { resource_type: "auto", folder },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+
+    // Convert buffer to stream and pipe it to Cloudinary
+    Readable.from(buffer).pipe(stream);
+  });
+};
+
+// Route for handling profile picture uploads
+app.post(
+  "/api/upload",
+  upload.single("file"), // Use 'file' as the field name for the profile picture
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded." });
+      }
+
+      const file = req.file;
+
+      // Upload profile picture to Cloudinary
+      const result = await uploadToCloudinary(
+        file.buffer,
+        file.mimetype,
+        "blog-pics"
+      );
+
+      // Return the URL of the uploaded profile picture
+      res.status(200).json({ url: result.secure_url });
+    } catch (err) {
+      console.error("Profile picture upload failed:", err);
+      res
+        .status(500)
+        .json({ error: "Profile picture upload failed", details: err.message });
+    }
+  }
+);
 
 app.listen(PORT, () => {
   console.log("Backend is running on ", PORT);
