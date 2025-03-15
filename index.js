@@ -67,6 +67,7 @@ app.post(
       }
 
       const file = req.file;
+      console.log("setting up file");
 
       // Upload profile picture to Cloudinary
       const result = await uploadToCloudinary(
@@ -74,6 +75,8 @@ app.post(
         file.mimetype,
         "blog-pics"
       );
+
+      console.log("just sent image to cloudinary :", result);
 
       // Return the URL of the uploaded profile picture
       res.status(200).json({ url: result.secure_url });
