@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const cors = require("cors");
 const path = require("path");
+const morgan = require("morgan");
 
 // Routes
 const authRoute = require("./routes/auth");
@@ -18,7 +19,8 @@ const cloudinary = require("./cloudinary");
 const PORT = process.env.PORT || 4560;
 
 app.use(express.json());
-app.use("/images", express.static(path.join(__dirname, "/images")));
+app.use(morgan("common"));
+// app.use("/images", express.static(path.join(__dirname, "/images")));
 app.use(
   cors({
     origin: [process.env.LOCAL_URL, "https://blog-app-ui-two.vercel.app"],
@@ -41,20 +43,20 @@ app.use("/api/category", categoryRoute);
 
 const upload = multer();
 
-const uploadToCloudinary = (buffer, mimetype, folder) => {
-  return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      { resource_type: "auto", folder },
-      (error, result) => {
-        if (error) reject(error);
-        else resolve(result);
-      }
-    );
+// const uploadToCloudinary = (buffer, mimetype, folder) => {
+//   return new Promise((resolve, reject) => {
+//     const stream = cloudinary.uploader.upload_stream(
+//       { resource_type: "auto", folder },
+//       (error, result) => {
+//         if (error) reject(error);
+//         else resolve(result);
+//       }
+//     );
 
-    // Convert buffer to stream and pipe it to Cloudinary
-    Readable.from(buffer).pipe(stream);
-  });
-};
+//     // Convert buffer to stream and pipe it to Cloudinary
+//     Readable.from(buffer).pipe(stream);
+//   });
+// };
 
 // Route for handling profile picture uploads
 app.post(
@@ -67,14 +69,16 @@ app.post(
       }
 
       const file = req.file;
-      console.log("setting up file");
+
+      const dataUri = `data:${file.mimetype};base64,${file.buffer.toString(
+        "base64"
+      )}`;
 
       // Upload profile picture to Cloudinary
-      const result = await uploadToCloudinary(
-        file.buffer,
-        file.mimetype,
-        "blog-pics"
-      );
+      const result = await cloudinary.uploader.upload(dataUri, {
+        folder: "images",
+        resource_type: "auto",
+      });
 
       console.log("just sent image to cloudinary :", result);
 
