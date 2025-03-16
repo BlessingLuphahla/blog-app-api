@@ -85,10 +85,25 @@ const deletePost = async (req, res) => {
   }
 };
 
+const getSortedFew = async (req, res) => {
+  console.log(req);
+
+  try {
+    const posts = await Post.find().sort({ createdAt: -1 }).limit(6);
+    console.log(posts);
+
+    res.status(200).json(posts);
+  } catch (error) {
+    res.status(500).json(error);
+    console.log(error);
+  }
+};
+
 module.exports = {
   getPostById,
   getAllPosts,
   createPost,
   updatePost,
   deletePost,
+  getSortedFew,
 };

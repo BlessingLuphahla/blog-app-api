@@ -5,10 +5,11 @@ const {
   createPost,
   updatePost,
   deletePost,
+  getSortedFew,
 } = require("../controllers/post");
 
 // GET BY ID
-router.get("/:id", getPostById);
+router.get("/find/:id", getPostById);
 
 // GET ALL
 router.get("/", getAllPosts);
@@ -21,5 +22,8 @@ router.put("/:id", updatePost);
 
 // DELETE
 router.delete("/:id", deletePost);
+
+// GET SORTED 5 LATEST MOST LATEST POST
+router.get("/top", getSortedFew);
 
 module.exports = router;
