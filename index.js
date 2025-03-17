@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(morgan("common"));
 app.use(
   cors({
-    origin: [process.env.LOCAL_URL, "https://blog-app-ui-two.vercel.app"],
+    origin: [process.env.LOCAL_URL, "https://blog-app-ui-plum.vercel.app/l"],
   })
 );
 
@@ -31,14 +31,12 @@ mongoose
   .then(console.log("Connected to MongoDB."))
   .catch((error) => console.error(error));
 
-
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
 app.use("/api/post", postRoute);
 app.use("/api/category", categoryRoute);
 
 const upload = multer();
-
 
 // Route for handling profile picture uploads
 app.post(
