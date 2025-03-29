@@ -12,6 +12,7 @@ const authRoute = require("./routes/auth");
 const userRoute = require("./routes/user");
 const postRoute = require("./routes/post");
 const categoryRoute = require("./routes/category");
+const pictureRoute = require("./routes/picture");
 
 dotenv.config();
 const cloudinary = require("./cloudinary");
@@ -34,6 +35,7 @@ mongoose
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
 app.use("/api/post", postRoute);
+app.use("/api/picture", pictureRoute);
 app.use("/api/category", categoryRoute);
 
 const upload = multer();
@@ -57,6 +59,40 @@ app.post(
       // Upload profile picture to Cloudinary
       const result = await cloudinary.uploader.upload(dataUri, {
         folder: "images",
+        resource_type: "auto",
+      });
+
+      console.log("just sent image to cloudinary :", result);
+
+      // Return the URL of the uploaded profile picture
+      res.status(200).json({ url: result.secure_url });
+    } catch (err) {
+      console.error("Profile picture upload failed:", err);
+      res
+        .status(500)
+        .json({ error: "Profile picture upload failed", details: err.message });
+    }
+  }
+);
+
+app.post(
+  "/api/gallery",
+  upload.single("file"), // Use 'file' as the field name for the profile picture
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded." });
+      }
+
+      const file = req.file;
+
+      const dataUri = `data:${file.mimetype};base64,${file.buffer.toString(
+        "base64"
+      )}`;
+
+      // Upload profile picture to Cloudinary
+      const result = await cloudinary.uploader.upload(dataUri, {
+        folder: "gallery",
         resource_type: "auto",
       });
 
