@@ -62,7 +62,6 @@ app.post(
         resource_type: "auto",
       });
 
-      console.log("just sent image to cloudinary :", result);
 
       // Return the URL of the uploaded profile picture
       res.status(200).json({ url: result.secure_url });
@@ -96,7 +95,6 @@ app.post(
         resource_type: "auto",
       });
 
-      console.log("just sent image to cloudinary :", result);
 
       // Return the URL of the uploaded profile picture
       res.status(200).json({ url: result.secure_url });
