@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(morgan("common"));
 app.use(
   cors({
-    origin: [process.env.LOCAL_URL, "https://blog-app-ui-plum.vercel.app/l"],
+    origin: [process.env.LOCAL_URL, "https://blog-app-ui-plum.vercel.app"],
   })
 );
 
