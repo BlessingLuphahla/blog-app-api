@@ -23,7 +23,12 @@ app.use(express.json());
 app.use(morgan("common"));
 app.use(
   cors({
-    origin: [process.env.LOCAL_URL, "https://blog-app-ui-plum.vercel.app"],
+    origin: [
+      process.env.LOCAL_URL,
+      "https://blog-app-ui-plum.vercel.app",
+      "https://its-travel.com",
+      "https://www.its-travel.com",
+    ],
   })
 );
 
@@ -62,7 +67,6 @@ app.post(
         resource_type: "auto",
       });
 
-
       // Return the URL of the uploaded profile picture
       res.status(200).json({ url: result.secure_url });
     } catch (err) {
@@ -94,7 +98,6 @@ app.post(
         folder: "gallery",
         resource_type: "auto",
       });
-
 
       // Return the URL of the uploaded profile picture
       res.status(200).json({ url: result.secure_url });
