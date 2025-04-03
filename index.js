@@ -26,8 +26,8 @@ app.use(
     origin: [
       process.env.LOCAL_URL,
       "https://blog-app-ui-plum.vercel.app",
-      "https://its-travel.com",
-      "https://www.its-travel.com",
+      "https://its-travels.com",
+      "https://www.its-travels.com",
     ],
   })
 );
